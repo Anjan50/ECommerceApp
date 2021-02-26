@@ -6,6 +6,7 @@ public class ItemModel {
 
     public ItemModel() {
     }
+
     public ItemModel(int image, String nama, String usia, String kota) {
         this.image = image;
         this.nama = nama;
@@ -18,6 +19,22 @@ public class ItemModel {
 
     public String getNama() {
         return nama;
+    }
+
+    public void setImage(int image) {
+        this.image = image;
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+
+    public void setUsia(String usia) {
+        this.usia = usia;
+    }
+
+    public void setKota(String kota) {
+        this.kota = kota;
     }
 
     public String getUsia() {

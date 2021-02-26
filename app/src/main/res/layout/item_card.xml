@@ -14,7 +14,8 @@
     <ImageView
         android:id="@+id/item_image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:src="@drawable/sample1"
+        android:layout_height="450dp"
         android:scaleType="centerCrop"/>
 
     <LinearLayout
@@ -34,15 +35,17 @@
             android:textSize="26sp"/>
 
         <TextView
-            android:id="@+id/item_age"
+            android:id="@+id/item_rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
+            android:text="4.5/5.0"
+            android:background="#027E02"
             android:textColor="@android:color/white"
             android:textSize="18sp"/>
 
         <TextView
-            android:id="@+id/item_city"
+            android:id="@+id/item_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"

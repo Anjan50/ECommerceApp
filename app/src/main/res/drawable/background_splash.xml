@@ -2,6 +2,6 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 <item>
     <bitmap
-        android:src="@drawable/cse_image"/>
+        android:src="@drawable/splash_background_app"/>
 </item>
 </layer-list>

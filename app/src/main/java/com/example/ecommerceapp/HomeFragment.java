@@ -1,8 +1,11 @@
 package com.example.ecommerceapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DiffUtil;
 
@@ -11,9 +14,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager;
 import com.yuyakaido.android.cardstackview.CardStackListener;
 import com.yuyakaido.android.cardstackview.CardStackView;
@@ -23,6 +33,7 @@ import com.yuyakaido.android.cardstackview.SwipeableMethod;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,6 +47,11 @@ public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "HomeFragment";
+    private My_Wishlist my_wishlist = new My_Wishlist();
+    List<ItemModel> list = new ArrayList<>();
+    private int index = 0;
+
+    private ImageButton wishlist,cart;
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
     // TODO: Rename and change types of parameters
@@ -78,8 +94,40 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_home, container, false);
+        wishlist = v.findViewById(R.id.wish_button);
+
+        cart = v.findViewById(R.id.cart_button);
+        wishlist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Item added to Wishlist", Toast.LENGTH_SHORT).show();
+            }
+        });
+        cart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Item added to Cart", Toast.LENGTH_SHORT).show();
+            }
+        });
+        /*ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    list.clear();
+                    ItemModel image = postSnapshot.getValue(ItemModel.class);
+                    list.add(new ItemModel(image.image,image.nama,image.usia,image.kota));
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });*/
         CardStackView cardStackView = v.findViewById(R.id.card_stack_view);
         manager = new CardStackLayoutManager(getActivity(), new CardStackListener() {
+
             @Override
             public void onCardDragging(Direction direction, float ratio) {
                 Log.d(TAG, "onCardDragging: d=" + direction.name() + " ratio=" + ratio);
@@ -87,15 +135,18 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onCardSwiped(Direction direction) {
-                Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " d=" + direction);
+                //Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " d=" + direction);
+
+                Log.d(TAG, "onCardSwiped: "+list);
                 if (direction == Direction.Right) {
-                    Toast.makeText(getActivity(), "Direction Right", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Item added to Cart", Toast.LENGTH_SHORT).show();
                 }
                 if (direction == Direction.Top) {
                     Toast.makeText(getActivity(), "Direction Top", Toast.LENGTH_SHORT).show();
                 }
                 if (direction == Direction.Left) {
-                    Toast.makeText(getActivity(), "Direction Left", Toast.LENGTH_SHORT).show();
+                    adapter.getItemId(R.id.item_name);
+                    Toast.makeText(getActivity(), "Item added to Wishlist", Toast.LENGTH_SHORT).show();
                 }
                 if (direction == Direction.Bottom) {
                     Toast.makeText(getActivity(), "Direction Bottom", Toast.LENGTH_SHORT).show();
@@ -127,6 +178,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onCardDisappeared(View view, int position) {
                 TextView tv = view.findViewById(R.id.item_name);
+                index++;
                 Log.d(TAG, "onCardAppeared: " + position + ", nama: " + tv.getText());
             }
         });
@@ -147,6 +199,7 @@ public class HomeFragment extends Fragment {
         return v;
     }
 
+
     private void paginate() {
         List<ItemModel> old = adapter.getItems();
         List<ItemModel> baru = new ArrayList<>(addList());
@@ -156,19 +209,19 @@ public class HomeFragment extends Fragment {
         hasil.dispatchUpdatesTo(adapter);
     }
 
-    private List<ItemModel> addList() {
+    public List<ItemModel> addList() {
         List<ItemModel> items = new ArrayList<>();
-        items.add(new ItemModel(R.drawable.sample1, "Markonah", "24", "Jember"));
-        items.add(new ItemModel(R.drawable.sample2, "Marpuah", "20", "Malang"));
-        items.add(new ItemModel(R.drawable.sample3, "Sukijah", "27", "Jonggol"));
-        items.add(new ItemModel(R.drawable.sample4, "Markobar", "19", "Bandung"));
-        items.add(new ItemModel(R.drawable.sample5, "Marmut", "25", "Hutan"));
-
-        items.add(new ItemModel(R.drawable.sample1, "Markonah", "24", "Jember"));
-        items.add(new ItemModel(R.drawable.sample2, "Marpuah", "20", "Malang"));
-        items.add(new ItemModel(R.drawable.sample3, "Sukijah", "27", "Jonggol"));
-        items.add(new ItemModel(R.drawable.sample4, "Markobar", "19", "Bandung"));
-        items.add(new ItemModel(R.drawable.sample5, "Marmut", "25", "Hutan"));
+        items.add(new ItemModel(R.drawable.a, "boAt Rockerz 370", "4.1/5.0", "₹2999.00"));
+        items.add(new ItemModel(R.drawable.b, "boAt Rockerz 550", "4.5/5.0", "₹3599.00"));
+        items.add(new ItemModel(R.drawable.c, "boAt Airdopes 138", "3.9/5.0", "₹1599.00"));
+        items.add(new ItemModel(R.drawable.d, "boAt Airdopes 431", "4.1/5.0", "₹2999.00"));
+        items.add(new ItemModel(R.drawable.e, "Boult Audio ProBass", "4.0/5.0", "₹1900.00"));
+        items.add(new ItemModel(R.drawable.f, "Infinity Glide 500", "4.5/5.0", "₹1299.00"));
+        items.add(new ItemModel(R.drawable.g, "JBL Tune 500", "4.2/5.0", "₹2999.00"));
+        items.add(new ItemModel(R.drawable.h, "Philips UbBeat", "4.3/5.0", "₹3299.00"));
+        items.add(new ItemModel(R.drawable.i, "Sony WH CH10", "4.1/5.0", "₹2599.00"));
+        items.add(new ItemModel(R.drawable.j, "Zebronics Zeb Bang", "3.9/5.0", "₹2699.00"));
+        items.add(new ItemModel(R.drawable.shoes_1,"Shoes","4.1/5.0","₹2699.00"));
         return items;
     }
 
